@@ -1,0 +1,302 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block content %}
+    <div id="page-wrapper">
+    <div class="container-fluid mb0 ">
+        <!-- Page Heading -->
+                <div class="row page-header-box">
+                    <div class="col-lg-12">
+                        <h1 class="page-header">
+                            服务器
+                        </h1>
+                    </div>
+                </div>
+                <!-- /.row -->
+        <div class="panel panel-default table7_demo king-table7-demo3">
+            <div class="panel-heading">
+                服务器列表
+            </div>
+            <div>
+                <!-- 模态框（Modal） -->
+                    <div class="modal fade" id="add_node_modal" tabindex="-1" role="dialog" aria-labelledby="add_node_modal_label" aria-hidden="true">
+	                    <div class="modal-dialog">
+                            <!-- .modal-content -->
+                            <div class="modal-content">
+			                    <div class="modal-header">
+				                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					                    &times;
+				                    </button>
+				                    <h4 class="modal-title" id="add_node_modal_label">
+					                    新增节点
+				                    </h4>
+			                    </div>
+			                    <div class="modal-body">
+                                    <label id="add_state" class="text-center color-danger">状态</label>
+                                    <form class="form-horizontal" action="##" id="add_node_form" novalidate="novalidate">
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-3">NodeName:</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" type="text" name="name" id="add_node_input_name">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-3">NodeHost:</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" type="text" name="host" id="add_node_input_host">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-3">NodePort:</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" type="text" name="port" id="add_node_input_port">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-3">Username:</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" type="text" name="username" id="add_node_input_username">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="control-label col-sm-3">Password:</label>
+                                            <div class="col-sm-8">
+                                                <input class="form-control" type="password" name="add_node_input_password" id="add_node_input_password">
+                                            </div>
+                                        </div>
+                                    </form>
+			                    </div>
+                                <div class="modal-footer">
+				                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                                        取消
+				                    </button>
+				                    <button type="button" class="btn btn-primary" id="add_node_submit_btn">
+					                    提交
+				                    </button>
+			                    </div>
+		                    </div><!-- /.modal-content -->
+                        </div>
+	                </div><!-- /.modal -->
+                <table class="table table-header-bg table-hover mb0"
+                       data-classes="table table-hover "
+                       data-search="true"
+                       data-show-refresh="true"
+                       data-show-toggle="true"
+                       data-show-columns="true"
+                       data-toolbar="#toolbar"
+                       id="node_list">
+                </table>
+                {% if user.is_superuser %}
+                <div id="toolbar">
+                            <div class="btn-group">
+                            <button class="btn btn-default" data-toggle="modal" data-target="#add_node_modal">
+                            <i class="glyphicon glyphicon-plus"></i>
+                            </button>
+
+                </div></div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    </div>
+{% endblock %}
+
+<!-- /#wrapper -->
+    {% block script %}
+        <script src="https://magicbox.bk.tencent.com/static_api/v3/assets/validate-1.14.0/js/jquery.validate.js"></script>
+        <script src="https://magicbox.bk.tencent.com/static_api/v3/assets/jquery-validation-bootstrap-tooltip-0.10.2/jquery-validate.bootstrap-tooltip.js"></script>
+        <script type="text/javascript">
+        function createOrderTable(params) {
+            function operateFormatter(value, row, index) {
+                return [
+                    '<button type="button" class="RoleOfConnect king-btn king-success" style="margin-right:15px;">连接</button>',
+                ].join('');
+            };
+            function stateFormater(value, row, index) {
+                if (value == 0) {
+                    return [
+                        '<span class="label label-info">Contected</span>',
+                    ].join('');
+                }else {
+                    return [
+                        '<span class="label label-warning">Uncontect</span>',
+                    ].join('');
+                }
+            };
+            function nodeNameFormater(value, row, index) {
+               return [
+                        '<a href="' + 'detail/' + row.Name + '/">' + value + '</a>'
+                    ].join('');
+            };
+            window.operateEvents = {
+            'click .RoleOfConnect': function (e, value, row, index) {
+                console.log(row);
+                alert(row.Id);
+            }
+            };
+            $('#node_list').bootstrapTable('destroy');  //每次加载前，先销毁原来的表，相当于“刷新”
+            postOrderData = function (params) {
+            var temp = {
+                // limit: params.limit,   //页面大小，后端处理分页时，需要提供
+                // offset: params.offset,  //页码，后端处理分页时，需要提供
+                // "zoneID": $('#zoneID').val()
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            };
+            return temp;
+        };
+        $('#node_list').bootstrapTable({
+        url: 'nodes.json',
+        method: 'post',
+        contentType:"application/x-www-form-urlencoded; charset=UTF-8", // 默认是：'application/json'， 不改的话，后台获取不到数据！ ###### 非常重要！！######
+        queryParams: postOrderData,   //查询参数
+        cache: false,   //是否启用 数据缓存
+        pagination: true,  //是否分页
+        sidePageination: 'client',   //谁来分页，客户端：'client'，服务端：'server'
+        pageNumber: 1,   //默认显示 首页
+        pageSize: 20,     //每页需要显示的数据量
+        pageList: [10, 25, 50],  //可供选择的，每页需要显示的数据量
+        showRefresh: true,
+        selectItemName: 'btSelectItem',
+        escape:true,
+        search:true,
+        showToggle:true,
+        idField:'Name',
+        maintainSelected:true,
+        height: 520,       //表格高度
+        uniqueId: 'Name',
+        silent: true,    // 刷新服务器数据
+        showExport: true,
+        exportDataType: 'all',
+        columns: [{
+            checkbox: true
+        },{
+            field: '#',
+            title: '#',
+            valign: 'middle',
+            align: 'left',
+            halign: 'center',
+            formatter: function (value, row, index) {
+                return index+1;
+            }
+        },{
+            field: 'Id',
+            title: 'Id',
+            valign: 'middle',
+            align: 'left',
+            halign: 'center',
+            visible: false
+        },{
+            field: 'Name',
+            title: '节点名',
+            valign: 'middle',
+            align: 'left',
+            halign: 'center',
+            formatter: nodeNameFormater
+        }, {
+            field: 'Host',
+            title: '主机名/IP',
+            valign: 'middle',
+            align: 'left',
+            halign: 'center'
+        }, {
+            field: 'Port',
+            title: '端口',
+            valign: 'middle',
+            align: 'left',
+            halign: 'center'
+        }, {
+            field: 'State',    //前后端 该字段必须一致！否则，后端传回来的数据，前端无法识别！
+            title: '状态',
+            valign: 'middle',
+            align: 'center',
+            halign: 'center',
+            formatter: stateFormater
+        }, {
+            field: 'Action',    //前后端 该字段必须一致！否则，后端传回来的数据，前端无法识别！
+            title: '操作',
+            valign: 'middle',
+            align: 'center',
+            halign: 'center',
+            formatter: operateFormatter,
+            events: operateEvents,
+        }],
+        responseHandler: function(res) {   //处理 从后端 返回的数据
+            console.log(res);
+            if (res == 0) {
+                alert('查询出问题！');
+            } else {
+                var nodeListData = res['rows'];  //##### 重要！！#####
+                return nodeListData;
+            }
+        },
+        onLoadError: function (status) {
+            console.log(status);
+            $('#node_list').bootstrapTable('removeAll');
+        }
+    });
+        };
+    $("#add_node_form").validate({
+        rules: {
+            name: {required: true},
+            host: {required: true},
+            port: {digits:true, required: true}
+        },
+        messages: {
+            name: "请输入Name",
+            host: "请输入Host",
+            port: "请输入端口(端口只能是数字)"
+        },
+        tooltip_options: {
+            name: {trigger:'focus'},
+            host: {trigger:'focus'},
+            port: {trigger:'focus'}
+        }
+    });
+    function resetForm () {
+        $(':input','#add_node_form')
+            .not(':button,:submit,:reset,:hidden')   //将myform表单中input元素type为button、submit、reset、hidden排除
+            .val('')  //将input元素的value设为空值
+            .removeAttr('checked')
+            .removeAttr('checked') // 如果任何radio/checkbox/select inputs有checked or selected 属性，将其移除
+    }
+    $("#add_node_modal").on("hidden.bs.model",function(e){$("#add_state").hide();resetForm();});
+    $(document).ready(function(){
+        $('#add_state').hide();
+            createOrderTable();
+              $.ajaxSetup({
+                   data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
+              });
+            $("#add_node_submit_btn").on("click",function () {
+                    console.log("submit");
+                    $.ajax({
+                    //几个参数需要注意一下
+                        type: "POST",//方法类型
+                        dataType: "json",//预期服务器返回的数据类型
+                        url: "{% url 'supervisor:add_node' %}" ,
+                        data: {
+                            name:$("#add_node_input_name").val(),
+                            host:$("#add_node_input_host").val(),
+                            port:$("#add_node_input_port").val(),
+                            username:$("#add_node_input_username").val(),
+                            password:$("#add_node_input_password").val()
+                        },
+                        success: function (result) {
+                            console.log(result);//打印服务端返回的数据(调试用)
+                            if(result.code == 0) {
+                                $("#add_node_modal").modal('hide');
+                                resetForm();
+                                $("#add_state").hide()
+                                $("#node_list").bootstrapTable('refresh');
+                            }else{
+                                $("#add_state").html(result.msg)
+                                 $("#add_state").show()
+                            }
+                        },
+                        error : function() {
+                            alert("异常！");
+                        }
+                    });
+                });
+            });
+</script>
+    {% endblock %}

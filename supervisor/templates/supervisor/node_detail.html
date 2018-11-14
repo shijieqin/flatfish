@@ -1,0 +1,443 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block content %}
+    <div id="page-wrapper">
+    <div class="container-fluid mb0 ">
+        <!-- Page Heading -->
+                <div class="row page-header-box">
+                    <div class="col-lg-12">
+                        <h1 class="page-header">
+                            详细
+                        </h1>
+                    </div>
+                </div>
+                <!-- /.row -->
+        <div class="panel panel-default table7_demo king-table7-demo3">
+            <div class="panel-heading">
+                进程列表
+            </div>
+            <div class="modal fade" id="logs_modal" tabindex="-1" role="dialog" aria-labelledby="logs_modal_label" aria-hidden="true">
+	                    <div class="modal-dialog" style="width: 680px;">
+                            <!-- .modal-content -->
+                            <div class="modal-content">
+			                    <div class="modal-header">
+				                    <button id="logs_modle_close_btn" type="button" class="close">
+					                    &times;
+				                    </button>
+				                    <h4 class="modal-title" id="logs_modal_label">
+					                    日志
+				                    </h4>
+			                    </div>
+			                    <div class="modal-body">
+                                    <textarea class="form-control" id="logs" rows="40" placeholder="加载中。。。" readonly="readonly"></textarea>
+			                    </div>
+		                    </div><!-- /.modal-content -->
+                        </div>
+	                </div><!-- /.modal -->
+            <table class="table table-header-bg table-hover mb0"
+                       data-classes="table table-hover "
+                       data-search="true"
+                       data-show-refresh="true"
+                       data-show-toggle="true"
+                       data-show-columns="true"
+                       data-toolbar="#toolbar"
+                       id="process_list">
+                </table>
+                <div id="toolbar">
+                    <div class="btn-group">
+                        <div class="btn-group">
+                            <button id="RestartSelect" class="RoleOfRestart btn btn-default king-success">
+                                <i class="fa fa-refresh btn-icon"></i>
+                            </button>
+                            <button id="StopSelect" class="RoleOfStop btn btn-default king-warning">
+                                <i class="fa fa-toggle-on btn-icon"></i>
+                            </button>
+                            <button id="StartSelect" class="RoleOfStart btn btn-default king-info">
+                                <i class="fa fa-toggle-off btn-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+    </div>
+{% endblock %}
+
+<!-- /#wrapper -->
+{% block script %}
+    <script type="text/javascript">
+    var rl
+    var editor
+    var selected_processes = new Array();
+    function startProcess(processes) {
+        console.log(processes);
+        $.ajax({
+            type: "POST",//方法类型
+            dataType: "json",//预期服务器返回的数据类型
+            url: "{% url 'supervisor:process_start' %}" ,
+            data: {
+                processes: JSON.stringify(processes)
+            },
+            success: function (result) {
+                console.log(result);//打印服务端返回的数据(调试用)
+                $("#process_list").bootstrapTable('refresh');
+                },
+            error : function() {
+                alert("异常！");
+            }
+        });
+    };
+    function restartProcess(processes) {
+        console.log("submit");
+        $.ajax({
+            type: "POST",//方法类型
+            dataType: "json",//预期服务器返回的数据类型
+            url: "{% url 'supervisor:process_restart' %}" ,
+            data: {
+                processes: JSON.stringify(processes)
+            },
+            success: function (result) {
+                console.log(result);//打印服务端返回的数据(调试用)
+                $("#process_list").bootstrapTable('refresh');
+                },
+            error : function() {
+                alert("异常！");
+            }
+        });
+    };
+    function stopProcess(processes) {
+        console.log("submit");
+        $.ajax({
+            type: "POST",//方法类型
+            dataType: "json",//预期服务器返回的数据类型
+            url: "{% url 'supervisor:process_stop' %}" ,
+            data: {
+                processes: JSON.stringify(processes)
+            },
+            success: function (result) {
+                console.log(result);//打印服务端返回的数据(调试用)
+                $("#process_list").bootstrapTable('refresh');
+                },
+            error : function() {
+                alert("异常！");
+            }
+        });
+    };
+    function refreshLogs(process) {
+        console.log("refreshlog");
+        $.ajax({
+            type: "POST",//方法类型
+            dataType: "json",//预期服务器返回的数据类型
+            url: "{% url 'supervisor:process_get_logs' %}" ,
+            data: {
+                process: JSON.stringify(process)
+            },
+            success: function (result) {
+                var text=""
+                logs = result.logs
+                for (var line in logs){
+                    text += logs[line] + "\r\n"
+                }
+                $("#logs").val(text)
+                //editor.setValue(text)
+            },
+            error : function() {
+                alert("异常！");
+            }
+        });
+    };
+
+    function createProcessTable(params) {
+            function operateFormatter(value, row, index) {
+                if (row['StateCode'] > 0 && row['StateCode'] < 30) {
+                    return [
+                        '<div class="btn-group">\n' +
+                        '    <button class="RoleOfRestart btn btn-default king-success">\n' +
+                        '        <i class="fa fa-refresh btn-icon"></i>\n' +
+                        '    </button>\n' +
+                        '    <button class="RoleOfStop btn btn-default king-warning">\n' +
+                        '        <i class="fa fa-toggle-on btn-icon"></i>\n' +
+                        '    </button>\n' +
+                        '    <button class="RoleOfLog btn btn-default king-info">\n' +
+                        '        <i class="fa fa-file-text btn-icon"></i>\n' +
+                        '    </button>\n' +
+                        '</div>',
+                    ].join('');
+                }else {
+                    return [
+                        '<div class="btn-group">\n' +
+                        '    <button class="RoleOfRestart btn btn-default king-success">\n' +
+                        '        <i class="fa fa-refresh btn-icon"></i>\n' +
+                        '    </button>\n' +
+                        '    <button class="RoleOfStart btn btn-default king-success" title="启动">\n' +
+                        '        <i class="fa fa-toggle-off btn-icon"></i>\n' +
+                        '    </button>\n' +
+                        '    <button class="RoleOfLog btn btn-default king-info" title="日志">\n' +
+                        '        <i class="fa fa-file-text btn-icon"></i>\n' +
+                        '    </button>\n' +
+                        '</div>',
+                    ].join('');
+                }
+            };
+            function stateFormater(value, row, index) {
+                var code_lable = {
+                    0: 'label-danger',
+                    10: 'label-primary',
+                    20: 'label-success',
+                    30: 'label-info',
+                    40: 'label-primary',
+                    100: 'label-danger',
+                    200: 'label-danger',
+                    1000: 'label-default'
+                };
+                return [
+                    '<span class="label ' + code_lable[row.StateCode] + '">' + value + '</span>',
+                ].join('');
+            };
+            function processNameFormater(value, row, index) {
+               return [
+                        '<a href="' + value + '/">' + value + '</a>'
+                    ].join('');
+            };
+            window.operateEvents = {
+                'click .RoleOfRestart': function (e, value, row, index) {
+                    console.log(row);
+                    var process = new Array()
+                    process.push(row.NodeName)
+                    process.push(row.Name)
+                    var processes = new Array()
+                    processes.push(process)
+                    restartProcess(processes)
+                },
+                'click .RoleOfStart': function (e, value, row, index) {
+                    console.log(row);
+                    var process = new Array()
+                    process.push(row.NodeName)
+                    process.push(row.Name)
+                    var processes = new Array()
+                    processes.push(process)
+                    startProcess(processes)
+                },
+                'click .RoleOfStop': function (e, value, row, index) {
+                    console.log(row);
+                    var process = new Array()
+                    process.push(row.NodeName)
+                    process.push(row.Name)
+                    var processes = new Array()
+                    processes.push(process)
+                    stopProcess(processes)
+                },
+                'click .RoleOfLog': function (e, value, row, index) {
+                    var process = new Array()
+                    process.push(row.NodeName)
+                    process.push(row.Name)
+                    $("#logs_modal").modal('show');
+                    refreshLogs(process)
+                    //editor.setSize('auto','700px');
+                    rl = window.setInterval(function () {refreshLogs(process)}, 1000)
+                }
+            };
+            $('#process_list').bootstrapTable('destroy');  //每次加载前，先销毁原来的表，相当于“刷新”
+            postOrderData = function (params) {
+            var temp = {
+                // limit: params.limit,   //页面大小，后端处理分页时，需要提供
+                // offset: params.offset,  //页码，后端处理分页时，需要提供
+                // "zoneID": $('#zoneID').val()
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            };
+            return temp;
+        };
+        $('#process_list').bootstrapTable({
+        url: 'processes.json',
+        method: 'post',
+        contentType:"application/x-www-form-urlencoded; charset=UTF-8", // 默认是：'application/json'， 不改的话，后台获取不到数据！ ###### 非常重要！！######
+        queryParams: postOrderData,   //查询参数
+        cache: false,   //是否启用 数据缓存
+        pagination: true,  //是否分页
+        sidePageination: 'client',   //谁来分页，客户端：'client'，服务端：'server'
+        pageNumber: 1,   //默认显示 首页
+        pageSize: 20,     //每页需要显示的数据量
+        pageList: [10, 25, 50],  //可供选择的，每页需要显示的数据量
+        showRefresh: true,
+        selectItemName: 'btSelectItem',
+        escape:true,
+        search:true,
+        showToggle:true,
+        idField:'Name',
+        maintainSelected:true,
+        height: 520,       //表格高度
+        uniqueId: 'Name',
+        silent: true,    // 刷新服务器数据
+        showExport: true,
+        exportDataType: 'all',
+        columns: [{
+            checkbox: true
+        },{
+            field: '#',
+            title: '#',
+            valign: 'middle',
+            align: 'left',
+            halign: 'center',
+            formatter: function (value, row, index) {
+                return index+1;
+            }
+        },{
+            field: 'NodeName',
+            title: '节点名',
+            valign: 'middle',
+            align: 'left',
+            halign: 'center',
+            visible: false
+        },{
+            field: 'Name',
+            title: '进程名',
+            valign: 'middle',
+            align: 'left',
+            halign: 'center',
+            formatter: processNameFormater
+        }, {
+            field: 'Pid',
+            title: 'PID',
+            valign: 'middle',
+            align: 'left',
+            halign: 'center'
+        }, {
+            field: 'Group',
+            title: '分组',
+            valign: 'middle',
+            align: 'left',
+            halign: 'center'
+        }, {
+            field: 'Type',    //前后端 该字段必须一致！否则，后端传回来的数据，前端无法识别！
+            title: '功能',
+            valign: 'middle',
+            align: 'center',
+            halign: 'center'
+        }, {
+            field: 'Environment',    //前后端 该字段必须一致！否则，后端传回来的数据，前端无法识别！
+            title: '环境',
+            valign: 'middle',
+            align: 'center',
+            halign: 'center'
+        },{
+            field: 'Uptime',    //前后端 该字段必须一致！否则，后端传回来的数据，前端无法识别！
+            title: '持续时间',
+            valign: 'middle',
+            align: 'center',
+            halign: 'center'
+        },{
+            field: 'State',    //前后端 该字段必须一致！否则，后端传回来的数据，前端无法识别！
+            title: '状态',
+            valign: 'middle',
+            align: 'center',
+            halign: 'center',
+            formatter: stateFormater
+        },{
+            field: 'StateCode',    //前后端 该字段必须一致！否则，后端传回来的数据，前端无法识别！
+            title: '状态编码',
+            valign: 'middle',
+            align: 'center',
+            halign: 'center',
+            visible: false
+        },{
+            field: 'Action',    //前后端 该字段必须一致！否则，后端传回来的数据，前端无法识别！
+            title: '操作',
+            valign: 'middle',
+            align: 'center',
+            halign: 'center',
+            formatter: operateFormatter,
+            events: operateEvents
+        }],
+        responseHandler: function(res) {   //处理 从后端 返回的数据
+            console.log(res);
+            if (res == 0) {
+                alert('查询出问题！');
+            } else {
+                var processListData = res['rows'];  //##### 重要！！#####
+                return processListData;
+            }
+        },
+        onLoadError: function (status) {
+            console.log(status);
+            $('#node_list').bootstrapTable('removeAll');
+        }
+    });
+    };
+    $(document).ready(function(){
+            createProcessTable();
+              $.ajaxSetup({
+                   data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
+              });
+              //editor = CodeMirror.fromTextArea(document.getElementById("logs"), {
+              //      lineNumbers: true,
+              //      mode: "text/html",
+              //      matchBrackets: true,
+              //      readOnly: true
+              //      });
+              $("#logs_modle_close_btn").on("click", function () {
+                  window.clearInterval(rl)
+                  $("#logs_modal").modal('hide')
+                  $("#logs").val("")
+                  //editor.clear()
+              });
+              $("#StartSelect").on("click", function () {
+                  data = $('#process_list').bootstrapTable('getSelections')
+                  for(rowid in data){
+                      var process = new Array()
+                      row = data[rowid]
+                        process.push(row.NodeName)
+                        process.push(row.Name)
+                      selected_processes.push(process)
+                  }
+                  startProcess(selected_processes)
+              });
+              $("#RestartSelect").on("click", function () {
+                  data = $('#process_list').bootstrapTable('getSelections')
+                  for(rowid in data){
+                      var process = new Array()
+                      row = data[rowid]
+                        process.push(row.NodeName)
+                        process.push(row.Name)
+                      selected_processes.push(process)
+                  }
+                  restartProcess(selected_processes)
+              });
+              $("#StopSelect").on("click", function () {
+                  data = $('#process_list').bootstrapTable('getSelections')
+                  for(rowid in data){
+                      var process = new Array()
+                      row = data[rowid]
+                        process.push(row.NodeName)
+                        process.push(row.Name)
+                      selected_processes.push(process)
+                  }
+                  stopProcess(selected_processes)
+              });
+            $("#add_node_submit_btn").on("click",function () {
+                    console.log("submit");
+                    $.ajax({
+                    //几个参数需要注意一下
+                        type: "POST",//方法类型
+                        dataType: "json",//预期服务器返回的数据类型
+                        url: "{% url 'supervisor:add_node' %}" ,
+                        data: {
+                            name:$("#add_node_input_name").val(),
+                            host:$("#add_node_input_host").val(),
+                            port:$("#add_node_input_port").val(),
+                            username:$("#add_node_input_username").val(),
+                            password:$("#add_node_input_password").val()
+                        },
+                        success: function (result) {
+                            console.log(result);//打印服务端返回的数据(调试用)
+
+		                    $("#add_node_modal").modal('hide');
+                        },
+                        error : function() {
+                            alert("异常！");
+                        }
+                    });
+                });
+            });
+    </script>
+{% endblock %}

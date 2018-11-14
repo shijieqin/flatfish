@@ -1,0 +1,195 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="zh-Hans">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>风格定制-Bootstrap样例1</title>
+    <!-- Bootstrap css -->
+    <link href="https://magicbox.bk.tencent.com/static_api/v3/assets/bootstrap-3.3.4/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{% static 'css/bootstrap-table.min.css' %}" rel="stylesheet">
+    <!-- 当前项目样式文件 -->
+    <link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet">
+    <link href="{% static 'css/sb-admin.css' %}" rel="stylesheet">
+    <link href="{% static 'css/sb-bk-theme.css' %}" rel="stylesheet">
+    <!--蓝鲸平台APP 公用的样式文件 -->
+        <link rel="stylesheet" type="text/css" href="{% static 'css/bk.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'css/index.css' %}">
+    <!-- 以下两个插件用于在IE8以及以下版本浏览器支持HTML5元素和媒体查询，如果不需要用可以移除 -->
+    <!--[if lt IE 9]>
+    <script src="https://magicbox.bk.tencent.com/static_api/v3/assets/js/html5shiv.min.js"></script>
+    <script src="https://magicbox.bk.tencent.com/static_api/v3/assets/js/respond.min.js"></script>
+    <![endif]-->
+    {% block css %}
+    {% endblock %}
+</head>
+
+
+<body>
+
+    <div id="wrapper">
+        <!-- Navigation -->
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="{% url 'supervisor:home' %}">
+                    <i class="fa fa-leaf f20 mr5"></i>
+                    进程管理系统
+                </a>
+            </div>
+            <!-- Top Menu Items -->
+            <ul class="nav navbar-right top-nav">
+                <li class="dropdown">
+                    <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-envelope"></i> <b class="caret"></b></a>
+                    <ul class="dropdown-menu message-dropdown">
+                        <li class="message-preview">
+                            <a href="javascript:;">
+                                <div class="media">
+                                    <span class="pull-left">
+                                        <img class="media-object" src="{% static 'img/50x50.png' %}" alt="">
+                                    </span>
+                                    <div class="media-body">
+                                        <h5 class="media-heading"><strong>qcloud</strong>
+                                        </h5>
+                                        <p class="small text-muted">Yesterday at 4:32 PM</p>
+                                        <p>当前有一条未读的短消息...</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="message-preview">
+                            <a href="javascript:;">
+                                <div class="media">
+                                    <span class="pull-left">
+                                        <img class="media-object" src="{% static 'img/50x50.png' %}" alt="">
+                                    </span>
+                                    <div class="media-body">
+                                        <h5 class="media-heading"><strong>qcloud</strong>
+                                        </h5>
+                                        <p class="small text-muted">Yesterday at 4:32 PM</p>
+                                        <p>当前有一条未读的短消息...</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="message-preview">
+                            <a href="javascript:;">
+                                <div class="media">
+                                    <span class="pull-left">
+                                        <img class="media-object" src="{% static 'img/50x50.png' %}" alt="">
+                                    </span>
+                                    <div class="media-body">
+                                        <h5 class="media-heading"><strong>qcloud</strong>
+                                        </h5>
+                                        <p class="small text-muted">Yesterday at 4:32 PM</p>
+                                        <p>当前有一条未读的短消息...</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="message-footer">
+                            <a href="javascript:;">查看所有消息</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-bell"></i> <b class="caret"></b></a>
+                    <ul class="dropdown-menu alert-dropdown">
+                        <li>
+                            <a href="javascript:;"><span class="label label-default">&nbsp;&nbsp;提醒内容&nbsp;&nbsp;</span></a>
+                        </li>
+                        <li>
+                            <a href="javascript:;"><span class="label label-primary">&nbsp;&nbsp;提醒内容&nbsp;&nbsp;</span></a>
+                        </li>
+                        <li>
+                            <a href="javascript:;"><span class="label label-success">&nbsp;&nbsp;提醒内容&nbsp;&nbsp;</span></a>
+                        </li>
+                        <li>
+                            <a href="javascript:;"><span class="label label-info">&nbsp;&nbsp;提醒内容&nbsp;&nbsp;</span></a>
+                        </li>
+                        <li>
+                            <a href="javascript:;"><span class="label label-warning">&nbsp;&nbsp;提醒内容&nbsp;&nbsp;</span></a>
+                        </li>
+                        <li>
+                            <a href="javascript:;"><span class="label label-danger">&nbsp;&nbsp;提醒内容&nbsp;&nbsp;</span></a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="javascript:;" class='text-center'>查看所有提醒</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> {{ request.user.username }} <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="javascript:;"><i class="fa fa-fw fa-user"></i> 用户</a>
+                        </li>
+                        <li>
+                            <a href="javascript:;"><i class="fa fa-fw fa-envelope"></i> 消息盒</a>
+                        </li>
+                        <li>
+                            <a href="javascript:;"><i class="fa fa-fw fa-gear"></i> 设置</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="{% url 'myauth:logout' %}"><i class="fa fa-fw fa-power-off"></i> 退出</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <!-- Sidebar Menu Items - These collapse to the responsive navigation menu on small screens -->
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav side-nav">
+                    <li>
+                        <a href="{% url 'supervisor:home' %}"><i class="fa fa-fw fa-dashboard"></i> 首页</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'supervisor:node' %}"><i class="fa fa-fw fa-server"></i> 服务器</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'supervisor:type' %}"><i class="fa fa-fw fa-tags"></i> 功能</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'supervisor:environment' %}"><i class="fa fa-fw fa-briefcase"></i> 项目</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </nav>
+
+        <div id="page-wrapper">
+            {% block content %}{% endblock %}
+        </div>
+        <!-- /#page-wrapper -->
+        <!-- 尾部声明 start -->
+        <div class="foot" id="footer">
+            {% block footerline %}{% endblock %}
+      </div>
+      <!-- 尾部声明 start -->
+
+    </div>
+    <!-- /#wrapper -->
+    <!-- 如果要使用Bootstrap的js插件，必须先调入jQuery -->
+    <script src="https://magicbox.bk.tencent.com/static_api/v3/assets/js/jquery-1.10.2.min.js"></script>
+    <!-- 包括所有bootstrap的js插件或者可以根据需要使用的js插件调用　-->
+    <script src="https://magicbox.bk.tencent.com/static_api/v3/assets/bootstrap-3.3.4/js/bootstrap.min.js"></script>
+    <script src="{% static 'js/bootstrap-table.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap-table-zh-CN.min.js' %}"></script>
+
+    <!-- 兼容性设置 -->
+    <!--[if lt IE 6]>\xe8\x93\x9d\xe9\xb2\xb8\xe6\x99\xba\xe8\x90\xa5\x20\xe7\x89\x88\xe6\x9d\x83\xe6\x89\x80\xe6\x9c\x89<![endif]-->
+    {% block script %}
+
+    {% endblock %}
+</body>
+</html>

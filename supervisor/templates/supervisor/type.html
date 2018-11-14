@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block css %}
+{% endblock %}
+
+{% block content %}
+    <div id="page-wrapper">
+    <div class="container-fluid mb0 ">
+        <!-- Page Heading -->
+                <div class="row page-header-box">
+                    <div class="col-lg-12">
+                        <h1 class="page-header">
+                            功能
+                        </h1>
+                    </div>
+                </div>
+                <!-- /.row -->
+        <div class="panel panel-default table7_demo king-table7-demo3">
+            <div class="panel-heading">
+                功能列表
+            </div>
+            <div>
+                <table class="table table-header-bg table-hover mb0"
+                       data-classes="table table-hover "
+                       data-search="true"
+                       data-show-refresh="true"
+                       data-show-toggle="true"
+                       data-show-columns="true"
+                       data-toolbar="#toolbar"
+                       id="type_list">
+                </table>
+                <div id="toolbar">
+                            <div class="btn-group">
+                            <button class="btn btn-default">
+                            <i class="glyphicon glyphicon-plus"></i>
+                            </button>
+                        <button class="btn btn-default">
+                        <i class="glyphicon glyphicon-trash"></i>
+                    </button>
+                </div></div>
+            </div>
+        </div>
+    </div>
+    </div>
+{% endblock %}
+
+<!-- /#wrapper -->
+    {% block script %}
+        <script src="https://magicbox.bk.tencent.com/static_api/v3/assets/validate-1.14.0/js/jquery.validate.js"></script>
+        <script src="https://magicbox.bk.tencent.com/static_api/v3/assets/jquery-validation-bootstrap-tooltip-0.10.2/jquery-validate.bootstrap-tooltip.js"></script>
+        <script type="text/javascript">
+        function createOrderTable(params) {
+            function TypeFormater(value, row, index) {
+               return [
+                        '<a href="' + 'detail/' + row.Type + '/">' + value + '</a>'
+                    ].join('');
+            };
+            $('#type_list').bootstrapTable('destroy');  //每次加载前，先销毁原来的表，相当于“刷新”
+            postOrderData = function (params) {
+            var temp = {
+                // limit: params.limit,   //页面大小，后端处理分页时，需要提供
+                // offset: params.offset,  //页码，后端处理分页时，需要提供
+                // "zoneID": $('#zoneID').val()
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            };
+            return temp;
+        };
+        $('#type_list').bootstrapTable({
+        url: 'types.json',
+        method: 'post',
+        contentType:"application/x-www-form-urlencoded; charset=UTF-8", // 默认是：'application/json'， 不改的话，后台获取不到数据！ ###### 非常重要！！######
+        queryParams: postOrderData,   //查询参数
+        cache: false,   //是否启用 数据缓存
+        pagination: true,  //是否分页
+        sidePageination: 'client',   //谁来分页，客户端：'client'，服务端：'server'
+        pageNumber: 1,   //默认显示 首页
+        pageSize: 20,     //每页需要显示的数据量
+        pageList: [10, 25, 50],  //可供选择的，每页需要显示的数据量
+        showRefresh: true,
+        selectItemName: 'btSelectItem',
+        escape:true,
+        search:true,
+        showToggle:true,
+        idField:'Name',
+        maintainSelected:true,
+        height: 520,       //表格高度
+        uniqueId: 'Name',
+        silent: true,    // 刷新服务器数据
+        showExport: true,
+        exportDataType: 'all',
+        columns: [{
+            checkbox: true
+        },{
+            field: '#',
+            title: '#',
+            valign: 'middle',
+            align: 'center',
+            halign: 'center',
+            formatter: function (value, row, index) {
+                return index+1;
+            }
+        },{
+            field: 'Type',
+            title: '功能',
+            valign: 'middle',
+            align: 'center',
+            halign: 'center',
+            formatter: TypeFormater
+        }, {
+            field: 'STOPPED',
+            title: 'STOPPED',
+            valign: 'middle',
+            align: 'center',
+            halign: 'center',
+            formatter: function (value, row, index) {
+                if(value){
+                    return value
+                }
+                return 0
+            }
+        }, {
+            field: 'STARTING',
+            title: 'STARTING',
+            valign: 'middle',
+            align: 'center',
+            halign: 'center',
+            formatter: function (value, row, index) {
+                if(value){
+                    return value
+                }
+                return 0
+            }
+        }, {
+            field: 'RUNNING',
+            title: 'RUNNING',
+            valign: 'middle',
+            align: 'center',
+            halign: 'center',
+            formatter: function (value, row, index) {
+                if(value){
+                    return value
+                }
+                return 0
+            }
+        }, {
+            field: 'BACKOFF',
+            title: 'BACKOFF',
+            valign: 'middle',
+            align: 'center',
+            halign: 'center',
+            formatter: function (value, row, index) {
+                if(value){
+                    return value
+                }
+                return 0
+            }
+        }, {
+            field: 'STOPPING',
+            title: 'STOPPING',
+            valign: 'middle',
+            align: 'center',
+            halign: 'center',
+            formatter: function (value, row, index) {
+                if(value){
+                    return value
+                }
+                return 0
+            }
+        }, {
+            field: 'EXITED',
+            title: 'EXITED',
+            valign: 'middle',
+            align: 'center',
+            halign: 'center',
+            formatter: function (value, row, index) {
+                if(value){
+                    return value
+                }
+                return 0
+            }
+        }, {
+            field: 'FATAL',
+            title: 'FATAL',
+            valign: 'middle',
+            align: 'center',
+            halign: 'center',
+            formatter: function (value, row, index) {
+                if(value){
+                    return value
+                }
+                return 0
+            }
+        }, {
+            field: 'UNKNOW',
+            title: 'UNKNOW',
+            valign: 'middle',
+            align: 'center',
+            halign: 'center',
+            formatter: function (value, row, index) {
+                if(value){
+                    return value
+                }
+                return 0
+            }
+        }],
+        responseHandler: function(res) {   //处理 从后端 返回的数据
+            console.log(res);
+            if (res == 0) {
+                alert('查询出问题！');
+            } else {
+                var typeListData = res['rows'];  //##### 重要！！#####
+                return typeListData;
+            }
+        },
+        onLoadError: function (status) {
+            console.log(status);
+            $('#type_list').bootstrapTable('removeAll');
+        }
+    });
+        };
+    $(document).ready(function(){
+            createOrderTable();
+              $.ajaxSetup({
+                   data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
+              });
+            });
+</script>
+    {% endblock %}
