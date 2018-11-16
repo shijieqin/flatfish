@@ -132,6 +132,20 @@ class Flatfish:
             _processes_tree[node_name] = _processes
         return _processes_tree
 
+    def get_processes_by_node(self, node_name):
+        _processes = list()
+        _connection = self.connections.get(node_name)
+        try:
+            if XmlRpc.is_connected(_connection) == 0:
+                _processes_info = _connection.supervisor.getAllProcessInfo()
+                for _p in _processes_info:
+                    _process = self.generate_process(_p, node_name)
+                    if self.has_permistion(_process):
+                        _processes.append(_process)
+        except Exception as _:
+            print(_)
+        return _processes
+
     def generate_process(self, p, node_name):
         process = Process(p)
         process.dictionary["node"] = node_name

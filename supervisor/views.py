@@ -48,7 +48,7 @@ def node_detail_query(request, node_name):
     _instance = Flatfish.getInstance(request.user)
     data = request.POST
     returnData = {"rows": []}
-    for _process in _instance.processes_tree.get(node_name):
+    for _process in _instance.get_processes_by_node(node_name):
         returnData["rows"].append({
             "NodeName": node_name,
             "Name": _process.name,
