@@ -51,13 +51,13 @@
                 <div id="toolbar">
                     <div class="btn-group">
                         <div class="btn-group">
-                            <button id="RestartSelect" class="RoleOfRestart btn btn-default king-success">
+                            <button id="RestartSelect" class="btn btn-default king-success" data-toggle="tooltip" title="重启选中的进程">
                                 <i class="fa fa-refresh btn-icon"></i>
                             </button>
-                            <button id="StopSelect" class="RoleOfStop btn btn-default king-warning">
+                            <button id="StopSelect" class="btn btn-default king-warning" data-toggle="tooltip" title="关闭选中的进程">
                                 <i class="fa fa-toggle-on btn-icon"></i>
                             </button>
-                            <button id="StartSelect" class="RoleOfStart btn btn-default king-info">
+                            <button id="StartSelect" class="btn btn-default king-info" data-toggle="tooltip" title="启动选中的进程">
                                 <i class="fa fa-toggle-off btn-icon"></i>
                             </button>
                         </div>
@@ -156,13 +156,13 @@
                 if (row['StateCode'] > 0 && row['StateCode'] < 30) {
                     return [
                         '<div class="btn-group">\n' +
-                        '    <button class="RoleOfRestart btn btn-default king-success">\n' +
+                        '    <button class="RoleOfRestart btn btn-default king-success" data-toggle="tooltip" title="重启">\n' +
                         '        <i class="fa fa-refresh btn-icon"></i>\n' +
                         '    </button>\n' +
-                        '    <button class="RoleOfStop btn btn-default king-warning">\n' +
+                        '    <button class="RoleOfStop btn btn-default king-warning" data-toggle="tooltip" title="关闭">\n' +
                         '        <i class="fa fa-toggle-on btn-icon"></i>\n' +
                         '    </button>\n' +
-                        '    <button class="RoleOfLog btn btn-default king-info">\n' +
+                        '    <button class="RoleOfLog btn btn-default king-info" data-toggle="tooltip" title="catalina.out">\n' +
                         '        <i class="fa fa-file-text btn-icon"></i>\n' +
                         '    </button>\n' +
                         '</div>',
@@ -170,13 +170,13 @@
                 }else {
                     return [
                         '<div class="btn-group">\n' +
-                        '    <button class="RoleOfRestart btn btn-default king-success">\n' +
+                        '    <button class="RoleOfRestart btn btn-default king-success" data-toggle="tooltip" title="重启">\n' +
                         '        <i class="fa fa-refresh btn-icon"></i>\n' +
                         '    </button>\n' +
-                        '    <button class="RoleOfStart btn btn-default king-success" title="启动">\n' +
+                        '    <button class="RoleOfStart btn btn-default king-success" data-toggle="tooltip" title="启动">\n' +
                         '        <i class="fa fa-toggle-off btn-icon"></i>\n' +
                         '    </button>\n' +
-                        '    <button class="RoleOfLog btn btn-default king-info" title="日志">\n' +
+                        '    <button class="RoleOfLog btn btn-default king-info" data-toggle="tooltip" title="catalina.out">\n' +
                         '        <i class="fa fa-file-text btn-icon"></i>\n' +
                         '    </button>\n' +
                         '</div>',
@@ -357,13 +357,14 @@
             console.log(status);
             $('#process_list').bootstrapTable('removeAll');
         },
-            onLoadSuccess : function(data) {
-                var data = $('#process_list').bootstrapTable('getData', true);
+            onPostBody: function (data) {
+                var data
                 console.log(data)
                    // 合并单元格
                 var fieldList=["NodeName"];
                 mergeCells(data, "NodeName", 1, $('#process_list'),fieldList);
-            }
+            $(function () { $("[data-toggle='tooltip']").tooltip(); });
+        }
     });
         };
 
@@ -427,6 +428,7 @@ function getCount(data,prop,fieldArr,index,sortMap){
 }
     $(document).ready(function(){
             createProcessTable();
+            $(function () { $("[data-toggle='tooltip']").tooltip(); });
               $.ajaxSetup({
                    data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
               });

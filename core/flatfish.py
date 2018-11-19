@@ -101,6 +101,7 @@ class Flatfish:
                     _policy_type.add(type)
         _policy["environment"] = list(_policy_environment)
         _policy["type"] = list(_policy_type)
+        print(_policy)
 
         self.__policy = _policy
 
@@ -317,7 +318,7 @@ class Flatfish:
     def serialize_general_type(self, _type):
         rest = dict()
         rest['Type'] = _type
-        for _p in self.processes:
+        for _p in self.get_processes_by_type_name(_type):
             rest[_p.statename] = rest.get(_p.statename, 0) + 1
 
         return rest
@@ -325,7 +326,7 @@ class Flatfish:
     def serialize_general_environment(self, _environment):
         rest = dict()
         rest['Environment'] = _environment
-        for _p in self.processes:
+        for _p in self.get_processes_by_environment_name(_environment):
             rest[_p.statename] = rest.get(_p.statename, 0) + 1
 
         return rest
