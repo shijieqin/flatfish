@@ -203,8 +203,12 @@ def type_query(request):
     _instance = Flatfish.getInstance(request.user)
     data = request.POST
     returnData = {"rows": []}
-    for _type in _instance.types:
-        returnData['rows'].append(_instance.serialize_general_type(_type))
+    # for _type in _instance.types:
+    #     returnData['rows'].append(_instance.serialize_general_type(_type))
+    # return JsonResponse(returnData)
+    for _type_name, _type in _instance.serialize_types().items():
+        _type['Type'] = _type_name
+        returnData['rows'].append(_type)
     return JsonResponse(returnData)
 
 
@@ -246,8 +250,11 @@ def environment_query(request):
     _instance = Flatfish.getInstance(request.user)
     data = request.POST
     returnData = {"rows": []}
-    for _environment in _instance.environments:
-        returnData['rows'].append(_instance.serialize_general_environment(_environment))
+    # for _environment in _instance.environments:
+    #     returnData['rows'].append(_instance.serialize_general_environment(_environment))
+    for _environment_name, _environment in _instance.serialize_environments().items():
+        _environment['Environment'] = _environment_name
+        returnData['rows'].append(_environment)
     return JsonResponse(returnData)
 
 

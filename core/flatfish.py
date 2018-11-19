@@ -12,6 +12,7 @@
 @time: 2018/11/8 4:17 PM 
 """
 import json
+import threading
 import xmlrpc.client
 
 from django.db.models import QuerySet
@@ -119,19 +120,38 @@ class Flatfish:
     @property
     def processes_tree(self):
         _processes_tree = dict()
+        thread_list = list()
         for node_name, _connection in self.connections.items():
-            _processes = list()
-            try:
-                if XmlRpc.is_connected(_connection) == 0:
-                    _processes_info = _connection.supervisor.getAllProcessInfo()
-                    for _p in _processes_info:
-                        _process = self.generate_process(_p, node_name)
-                        if self.has_permistion(_process):
-                            _processes.append(_process)
-            except Exception as _:
-                print(_)
-            _processes_tree[node_name] = _processes
+            t = threading.Thread(target=self.get_processes_by_node_t, args=(node_name, _processes_tree))
+            thread_list.append(t)
+            t.setDaemon(True)
+            t.start()
+
+        while len(thread_list) > 0:
+            for t in thread_list:
+                if not t.is_alive():
+                    thread_list.remove(t)
+
+        print(_processes_tree)
         return _processes_tree
+    # def processes_tree(self):
+    #     _processes_tree = dict()
+    #     for node_name, _connection in self.connections.items():
+    #         _processes = list()
+    #         try:
+    #             if XmlRpc.is_connected(_connection) == 0:
+    #                 _processes_info = _connection.supervisor.getAllProcessInfo()
+    #                 for _p in _processes_info:
+    #                     _process = self.generate_process(_p, node_name)
+    #                     if self.has_permistion(_process):
+    #                         _processes.append(_process)
+    #         except Exception as _:
+    #             print(_)
+    #         _processes_tree[node_name] = _processes
+    #     return _processes_tree
+
+    def get_processes_by_node_t(self, node_name, processes):
+        processes[node_name] = self.get_processes_by_node(node_name)
 
     def get_processes_by_node(self, node_name):
         _processes = list()
@@ -157,7 +177,8 @@ class Flatfish:
     @property
     def processes(self):
         _processes = list()
-        for node_name, _process_list in self.processes_tree.items():
+        _processes_tree = self.processes_tree
+        for node_name, _process_list in _processes_tree.items():
             _processes.extend(_process_list)
         return _processes
 
@@ -210,7 +231,8 @@ class Flatfish:
     @property
     def types(self):
         types = set()
-        for p in self.processes:
+        _processes = self.processes
+        for p in _processes:
             types.add(p.type)
 
         return list(types)
@@ -218,26 +240,44 @@ class Flatfish:
     @property
     def environments(self):
         environments = set()
-        for p in self.processes:
+        _processes = self.processes
+        for p in _processes:
             environments.add(p.environment)
 
         return list(environments)
 
-
     def get_environment_details(self, environment):
         environment = {
             "name": environment,
-            "members": self.get_processes_by_environment(environment),
+            "members": self.get_processes_by_environment_name(environment),
         }
         return environment
 
     def serialize_environments(self):
-        environments_with_details = []
-        for environment in self.environments:
-            environment_detail = self.get_environment_details(environment)
-            environments_with_details.append(environment_detail)
+        _serialize_environments = dict()
+        for _p in self.processes:
+            _environments = _serialize_environments.get(_p.environment, dict())
+            _environments[_p.statename] = _environments.get(_p.statename, 0) + 1
+            _serialize_environments[_p.environment] = _environments
 
-        return environments_with_details
+        print(_serialize_environments)
+        return _serialize_environments
+        # environments_with_details = []
+        # for environment in self.environments:
+        #     environment_detail = self.get_environment_details(environment)
+        #     environments_with_details.append(environment_detail)
+        #
+        # return environments_with_details
+
+    def serialize_types(self):
+        _serialize_types = dict()
+        for _p in self.processes:
+            _types = _serialize_types.get(_p.type, dict())
+            _types[_p.statename] = _types.get(_p.statename, 0) + 1
+            _serialize_types[_p.type] = _types
+
+        print(_serialize_types)
+        return _serialize_types
 
     def __get_type(self, name):
         return name.split('-')[1].title()
