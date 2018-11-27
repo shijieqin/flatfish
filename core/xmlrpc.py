@@ -34,7 +34,7 @@ class XmlRpc:
     def is_connected(connection):
         if connection:
             try:
-                connection.system.listMethods()
+                print(connection.system.listMethods())
                 return 0
             except (xmlrpc.client.ProtocolError, xmlrpc.client.Fault) as err:
                 print(err)

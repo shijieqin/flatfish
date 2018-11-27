@@ -7,6 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>登录</title>
+    <link rel="stylesheet" href="{% static 'css/bootstrapValidator.min.css' %}" />
     <!-- Bootstrap css -->
     <link href="https://magicbox.bk.tencent.com/static_api/v3/assets/bootstrap-3.3.4/css/bootstrap.min.css" rel="stylesheet">
     <!--蓝鲸提供的公用样式库 -->
@@ -21,7 +22,7 @@
     <!-- 以下两个插件用于在IE8以及以下版本浏览器支持HTML5元素和媒体查询，如果不需要用可以移除 -->
     <!--[if lt IE 9]><script src="https://magicbox.bk.tencent.com/static_api/v3/assets/js/html5shiv.min.js"></script><script src="https://magicbox.bk.tencent.com/static_api/v3/assets/js/respond.min.js"></script><![endif]-->
 </head>
-<body class="bg-white" data-bg-color="bg-white">
+<body class="bg-white" data-bg-color="bg-white" onKeyDown = "keyDown()">
     <div id="page-wrapper">
     <div class="king-page-box">
         <div class="king-container clearfix">
@@ -34,17 +35,18 @@
                 <div class="row">
                     <div class="col-md-4"></div>
                     <div class="col-md-4">
-                        <form class="form-vertical p15" id="login_form">
+                        <div class="form-vertical p15" id="login_form">
                             <div class="form-group ">
                                 <label>用户名：</label>
-                                <input type="text" class="form-control" id="id_username" placeholder="用户名"> </div>
+                                <input type="text" class="form-control" id="id_username" placeholder="用户名" name="username"> </div>
                             <div class="form-group ">
                                 <label>密码：</label>
-                                <input type="password" class="form-control" id="id_password" placeholder="密码"> </div>
+                                <input type="password" class="form-control" id="id_password" placeholder="密码" name="password"> </div>
                             <div class="form-group">
                                 <button type="button" class="king-btn mr10  king-success" id="login_form_submit_btn">登录</button>
+                                <small id="id_login_message" class="help-block, color-danger" style="display: none;"></small>
                             </div>
-                        </form>
+                        </div>
                     </div>
                     <div class="col-md-4"></div>
                 </div>
@@ -57,9 +59,56 @@
         </div>
     </div>
     </div>
+    <script type="text/javascript" src="{% static 'js/bootstrapValidator.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/zh_CN.js' %}"></script>
     <script type="text/javascript">
-        var next = GetQueryString("next")
-        console.log(next)
+        function keyDown()
+        {
+            if(event.keyCode ==13){
+                $("#login_form_submit_btn").click()
+            }
+        };
+        	function validator(){
+         		//输入项的验证
+         		$('#login_form').bootstrapValidator({
+         	        message: '输入值不满足不满足系统要求',
+         	        excluded : [':disabled'],
+         	        feedbackIcons: {
+         	            valid: 'glyphicon glyphicon-ok',
+         	            invalid: 'glyphicon glyphicon-remove',
+         	            validating: 'glyphicon glyphicon-refresh'
+         	        },
+         	        live: 'enabled',
+         	        fields: {
+         	        	username: {
+         	                message: '请检查用户名',
+         	                validators: {
+         	                     notEmpty: {
+         	                              message: '用户名不能为空'
+         	                         },
+         	                      regexp: {
+         	                         regexp: /^[^ ]+$/,
+         	                         message: '用户名不能有空格'
+         	                       }
+         	                }
+
+         	            },
+
+         	            password: {
+         	           	message:'请检查密码',
+         	               validators: {
+         	                   notEmpty: {
+         	                       message: '密码不能为空'
+
+         	                   }
+         	               }
+
+         	          },
+         	        }
+         	    });
+         	};
+        var next = GetQueryString("next");
+        console.log(next);
         function GetQueryString(name)
         {
             var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
@@ -71,7 +120,11 @@
               });
         $("#login_form_submit_btn").on("click",function () {
                     console.log("submit");
-                    $.ajax({
+                    validator();
+                    var bootstrapValidator = $("#login_form").data('bootstrapValidator');
+				    bootstrapValidator.validate();
+				    if(bootstrapValidator.isValid()){
+				        $.ajax({
                     //几个参数需要注意一下
                         type: "POST",//方法类型
                         dataType: "json",//预期服务器返回的数据类型
@@ -83,18 +136,24 @@
                         success: function (result) {
                             console.log(result);//打印服务端返回的数据(调试用)
                             if(result.code == 0){
+                                $("#id_login_message").html("")
+                                $("#id_login_message").hide()
                                 console.log(next)
                                 if(next !=null && next.toString().length>1)
                                 {
                                     window.location.href=next;
                                 }
                                 window.location.href="";
+                            }else{
+                                $("#id_login_message").html(result.msg)
+                                $("#id_login_message").show()
                             }
                         },
                         error : function() {
                             alert("异常！");
                         }
                     });
+                    };
                 });
     </script>
 </body>

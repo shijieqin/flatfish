@@ -20,4 +20,5 @@ app_name = 'myauth'
 urlpatterns = [
     url(r'^login$', views.login, name='login'),
     url(r'^logout', views.logout, name='logout'),
+    url(r'change_password', views.change_password, name='change_password'),
 ]

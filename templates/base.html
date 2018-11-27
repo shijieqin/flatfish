@@ -9,6 +9,7 @@
 
     <title>进程管理系统</title>
     <!-- Bootstrap css -->
+    <link rel="stylesheet" href="{% static 'css/bootstrapValidator.min.css' %}" />
     <link href="https://magicbox.bk.tencent.com/static_api/v3/assets/bootstrap-3.3.4/css/bootstrap.min.css" rel="stylesheet">
     <link href="{% static 'css/bootstrap-table.min.css' %}" rel="stylesheet">
     <!-- 当前项目样式文件 -->
@@ -132,7 +133,9 @@
                     <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> {{ request.user.username }} <b class="caret"></b></a>
                     <ul class="dropdown-menu">
                         <li>
-                            <a href="javascript:;"><i class="fa fa-fw fa-user"></i> 用户</a>
+                            <a href="javascript:;" data-toggle="modal" data-target="#change_password_modal">
+                            <i class="fa fa-fw fa-key"></i> 修改密码
+                            </a>
                         </li>
                         <li>
                             <a href="javascript:;"><i class="fa fa-fw fa-envelope"></i> 消息盒</a>
@@ -168,6 +171,55 @@
         </nav>
 
         <div id="page-wrapper">
+         <!-- 模态框（Modal） -->
+                    <div class="modal fade" id="change_password_modal" tabindex="-1" role="dialog" aria-labelledby="change_password_modal_label" aria-hidden="true">
+	                    <div class="modal-dialog" style="width: 400px;">
+                            <!-- .modal-content -->
+                            <div class="modal-content">
+			                    <div class="modal-header">
+				                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+					                    &times;
+				                    </button>
+				                    <h4 class="modal-title" id="change_password_modal_label">
+					                    修改密码
+				                    </h4>
+                                    <div class="label">
+                                        <small id="change_password_message" class="help-block, color-danger" style="display: none;"></small>
+                                    </div>
+			                    </div>
+			                    <div class="modal-body">
+                                    <form class="form-horizontal"  id="change_password_form">
+                                        <div class="form-group ">
+                                            <label for="old_pwd" class="col-sm-4 control-label">旧密码：</label>
+                                            <div class="col-sm-8">
+                                                <input type="password" class="form-control" id="old_pwd" placeholder="旧密码" name="old_pwd">
+                                            </div>
+                                        </div>
+                                        <div class="form-group ">
+                                            <label for="new_pwd" class="col-sm-4 control-label">新密码：</label>
+                                            <div class="col-sm-8">
+                                                <input type="password" class="form-control" id="new_pwd" placeholder="新密码" name="new_pwd">
+                                            </div>
+                                        </div>
+                                        <div class="form-group ">
+                                            <label for="confirm_pwd" class="col-sm-4 control-label">确认密码：</label>
+                                            <div class="col-sm-8">
+                                                <input type="password" class="form-control" id="confirm_pwd" placeholder="确认密码" name="confirm_pwd">
+                                            </div>
+                                        </div>
+                                    </form>
+			                    </div>
+                                <div class="modal-footer">
+				                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                                        取消
+				                    </button>
+				                    <button type="button" class="btn btn-primary" id="change_password_form_btn" onclick="changePassword();">
+					                    提交
+				                    </button>
+			                    </div>
+		                    </div><!-- /.modal-content -->
+                        </div>
+	                </div><!-- /.modal -->
             {% block content %}{% endblock %}
         </div>
         <!-- /#page-wrapper -->
@@ -185,6 +237,137 @@
     <script src="https://magicbox.bk.tencent.com/static_api/v3/assets/bootstrap-3.3.4/js/bootstrap.min.js"></script>
     <script src="{% static 'js/bootstrap-table.min.js' %}"></script>
     <script src="{% static 'js/bootstrap-table-zh-CN.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/bootstrapValidator.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/zh_CN.js' %}"></script>
+    <script type="text/javascript">
+        $(document).ready(function(){
+             $.ajaxSetup({
+                   data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
+              });
+        });
+        	function validator(){
+        	    console.log("validator")
+         		//输入项的验证
+         		$('#change_password_form').bootstrapValidator({
+         	        message: '输入值不满足不满足系统要求',
+         	        excluded : [':disabled'],
+         	        feedbackIcons: {
+         	            valid: 'glyphicon glyphicon-ok',
+         	            invalid: 'glyphicon glyphicon-remove',
+         	            validating: 'glyphicon glyphicon-refresh'
+         	        },
+         	        live: 'enabled',
+         	        fields: {
+         	        	old_pwd: {
+         	                message: '用户旧密码不满足系统要求',
+         	                validators: {
+         	                     notEmpty: {
+         	                              message: '用户旧密码不能为空'
+         	                         },
+         	                      stringLength: {
+         	                           min: 8,
+         	                           max: 50,
+         	                           message: '用户旧密码长度不能少于8位'
+         	                       },
+         	                      regexp: {
+         	                         regexp: /^[^ ]+$/,
+         	                         message: '用户旧密码不能有空格'
+         	                       }
+         	                }
+
+         	            },
+
+         	            new_pwd: {
+         	           	message:'新密码不满足系统要求',
+         	               validators: {
+         	                   notEmpty: {
+         	                       message: '用户新密码不能为空'
+
+         	                   },
+         	                  regexp : {
+     	    	                    regexp : /^(?:(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])|(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9])|(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])|(?=.*[a-z])(?=.*[0-9])(?=.*[^A-Za-z0-9])).{8,16}$/,
+     	    	                    message : '用户新密码长度为8至16位,并且需要包含数字、小写字母、大写字母、符号(至少三种)'
+     	                 	       },
+     	                 	  identical: {
+     	                            field: 'comfirm_pwd',
+     	                            message: '用户新密码与确认密码不一致！'
+     	                          },
+     	                 	  stringLength: {
+       	                           min: 8,
+       	                           max: 50,
+       	                           message: '用户新密码长度不能少于8位'
+       	                       }
+         	               }
+
+         	          },
+         	          confirm_pwd: {
+         	                validators: {
+         	                    notEmpty: {
+         	                        message: '确认密码不能为空'
+         	                    },
+         	                   regexp : {
+    	    	                    regexp : /^(?:(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])|(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9])|(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])|(?=.*[a-z])(?=.*[0-9])(?=.*[^A-Za-z0-9])).{8,16}$/,
+    	    	                    message : '用户确认密码长度为8至16位,并且需要包含数字、小写字母、大写字母、符号(至少三种)'
+    	                 	       },
+    	                 	  identical: {
+    	                            field: 'new_pwd',
+    	                            message: '用户新密码与确认密码不一致！'
+    	                          },
+    	                 	  stringLength: {
+      	                           min: 8,
+      	                           max: 50,
+      	                           message: '用户确认密码长度在8-50之间'
+      	                       }
+         	                }
+         	            }
+         	        }
+         	    });
+         	};
+            function changePassword () {
+                console.log("change")
+                validator()
+                var bootstrapValidator = $("#change_password_form").data('bootstrapValidator');
+                bootstrapValidator.validate();
+                if(bootstrapValidator.isValid()){
+                    $.ajax({
+                    //几个参数需要注意一下
+                        type: "POST",//方法类型
+                        dataType: "json",//预期服务器返回的数据类型
+                        url: "{% url 'myauth:change_password' %}" ,
+                        data: {
+                            'old_pwd':$('#old_pwd').val(),
+                            'new_pwd':$('#new_pwd').val(),
+                            'confirm_pwd':$('#confirm_pwd').val()
+                        },
+                        success: function (result) {
+                            console.log(result);//打印服务端返回的数据(调试用)
+                            if(result.code == 0){
+                                $("#change_password_message").html("")
+                                $("#change_password_message").hide()
+                                $("#change_password_modal").modal('hide');
+                            }else{
+                                $("#change_password_message").html(result.msg)
+                                $("#change_password_message").show()
+                            }
+                        },
+                        error : function() {
+                            alert("异常！");
+                        }
+                    });
+                }
+            };
+            $('#change_password_modal').on('hide.bs.modal', function () {
+              $('#change_password_form').bootstrapValidator('resetForm');
+              $('#change_password_form')[0].reset()
+            });
+        $(function(){
+         $(".side-nav li").each(function(){
+            if(String(window.location).indexOf($(this).children('a')[0].href) == 0){         
+                $(this).addClass("active");
+            }
+        })
+    });
+    </script>
 
     <!-- 兼容性设置 -->
     <!--[if lt IE 6]>\xe8\x93\x9d\xe9\xb2\xb8\xe6\x99\xba\xe8\x90\xa5\x20\xe7\x89\x88\xe6\x9d\x83\xe6\x89\x80\xe6\x9c\x89<![endif]-->

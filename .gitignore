@@ -7,3 +7,9 @@
 .idea/vcs.xml
 .idea/workspace.xml
 db.sqlite3
+.idea/webServers.xml
+.idea/deployment.xml
+*.pyc
+*.pyc
+core/__pycache__/flatfish.cpython-36.pyc
+core/__pycache__/xmlrpc.cpython-36.pyc
