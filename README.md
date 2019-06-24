@@ -39,3 +39,7 @@ supervisor ui with django
 - 子进程名必须是 env-project-num 格式，如: testENV-pr-2。
 - 执行python manage.py runserver 0.0.0.0:18000 的方式来修改监听ip和端口
 - 连接按钮暂时没有实现相应功能，页面刷新时会自动连接。节点显示Connected，说明已经连接.
+
+
+- 项目是初版，一直没有时间去更新，许多页面没有做跳转，会报404，此次应[@potoo0](https://github.com/potoo0)的需求，更新README，
+加入详细的使用说明。感谢[@potoo0](https://github.com/potoo0)提出的意见
